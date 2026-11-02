@@ -18,7 +18,14 @@ app = FastAPI(
 )
 
 
+@app.get("/", include_in_schema=False)
+def inicio() -> dict[str, str]:
+    """Indica a rota da API quando o domínio é aberto sem caminho."""
+    return {"mensagem": "API do rastreador Shopee", "endpoint": "/api/rastrear"}
+
+
 @app.get("/api/rastrear")
+@app.get("/rastrear", include_in_schema=False)
 def rastrear(
     paginas: int = Query(default=PAGINAS_PADRAO, ge=1, le=5),
 ) -> dict:
