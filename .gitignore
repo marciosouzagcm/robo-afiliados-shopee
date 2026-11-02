@@ -1,0 +1,16 @@
+# Segredos
+.env
+
+# Saídas geradas
+saida/
+DOCUMENTACAO_AFILIADOS.md
+afiliados_consolidado.csv
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+".env" 
+".venv/" 
+"saida/" 

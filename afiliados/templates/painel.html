@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel de Afiliados Shopee</title>
+<style>
+  :root {
+    --bg: #f6f4f2; --superficie: #ffffff; --superficie-2: #faf8f6;
+    --texto: #1f1b19; --texto-suave: #6b625d; --borda: #e7e1dc;
+    --marca: #ee4d2d; --marca-escura: #c93a1d; --marca-fundo: #fff0ec;
+    --ganho: #0f7a4d; --ganho-fundo: #e5f6ee; --estrela: #e8a100;
+    --sombra: 0 1px 2px rgba(31,27,25,.06), 0 4px 14px rgba(31,27,25,.05);
+    --raio: 14px;
+  }
+  :root[data-tema="escuro"] {
+    --bg: #151211; --superficie: #1f1b1a; --superficie-2: #262120;
+    --texto: #f3eeeb; --texto-suave: #a79d97; --borda: #342d2b;
+    --marca: #ff6a4a; --marca-escura: #ff8a70; --marca-fundo: #3a1f19;
+    --ganho: #4ade9b; --ganho-fundo: #12301f; --estrela: #f5b82e;
+    --sombra: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.3);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--texto);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .conteiner { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+  button, input, select { font: inherit; color: inherit; }
+
+  /* Cabeçalho */
+  header { background: linear-gradient(135deg, var(--marca), #ff8a4c); color: #fff; }
+  .topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 22px 34px; flex-wrap: wrap; }
+  .topo h1 { margin: 0; font-size: clamp(20px, 3vw, 28px); letter-spacing: -.01em; }
+  .topo p { margin: 2px 0 0; opacity: .9; font-size: 13px; }
+  .btn-tema {
+    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35); color: #fff;
+    padding: 8px 14px; border-radius: 999px; cursor: pointer;
+  }
+  .btn-tema:hover { background: rgba(255,255,255,.28); }
+
+  /* Indicadores */
+  .indicadores { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: -18px; }
+  .indicador { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); padding: 14px 16px; box-shadow: var(--sombra); }
+  .indicador span { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--texto-suave); }
+  .indicador strong { display: block; margin-top: 2px; font-size: 22px; }
+  .indicador.destaque strong { color: var(--ganho); }
+
+  /* Filtros */
+  .filtros { margin: 18px 0 14px; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); padding: 14px; box-shadow: var(--sombra); }
+  .filtros-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .campo label { display: block; font-size: 12px; color: var(--texto-suave); margin-bottom: 3px; }
+  .campo input, .campo select {
+    width: 100%; padding: 9px 10px; border: 1px solid var(--borda); border-radius: 10px;
+    background: var(--superficie-2);
+  }
+  .campo input:focus, .campo select:focus, button:focus-visible, a:focus-visible { outline: 2px solid var(--marca); outline-offset: 2px; }
+  .campo.busca, .campo.ordem { grid-column: span 2; }
+  .barra-acoes { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .contagem { color: var(--texto-suave); font-size: 14px; }
+  .acoes { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn { border: 1px solid var(--borda); background: var(--superficie-2); padding: 8px 14px; border-radius: 10px; cursor: pointer; }
+  .btn:hover { border-color: var(--marca); }
+  .btn.ativo { background: var(--marca); border-color: var(--marca); color: #fff; }
+  .btn.primario { background: var(--marca); border-color: var(--marca); color: #fff; }
+  .btn.primario:hover { background: var(--marca-escura); }
+
+  /* Cartões */
+  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; padding-bottom: 8px; }
+  .cartao { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--sombra); transition: transform .15s, border-color .15s; }
+  .cartao:hover { transform: translateY(-2px); border-color: var(--marca); }
+  .foto { position: relative; aspect-ratio: 1 / 1; background: var(--superficie-2); }
+  .foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .foto.sem-imagem::after { content: "Sem imagem"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--texto-suave); font-size: 13px; }
+  .selo { position: absolute; top: 8px; left: 8px; background: rgba(31,27,25,.82); color: #fff; font-weight: 700; font-size: 12px; padding: 3px 9px; border-radius: 999px; }
+  .selo.top { background: var(--marca); }
+  .selo-desc { position: absolute; top: 8px; right: 8px; background: #fff; color: var(--marca-escura); font-weight: 700; font-size: 12px; padding: 3px 8px; border-radius: 8px; }
+  .corpo { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .titulo { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.7em; }
+  .loja { font-size: 12px; color: var(--texto-suave); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .preco { font-size: 18px; font-weight: 700; }
+  .ganho { background: var(--ganho-fundo); color: var(--ganho); border-radius: 10px; padding: 8px 10px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .ganho strong { font-size: 17px; }
+  .ganho small { font-size: 12px; opacity: .9; }
+  .meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--texto-suave); }
+  .estrela { color: var(--estrela); }
+  .abrir { margin-top: auto; text-align: center; text-decoration: none; background: var(--marca); color: #fff; padding: 9px; border-radius: 10px; font-weight: 600; }
+  .abrir:hover { background: var(--marca-escura); }
+
+  /* Tabela */
+  .tabela-caixa { overflow-x: auto; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra); }
+  table { width: 100%; border-collapse: collapse; min-width: 860px; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--borda); vertical-align: middle; }
+  th { position: sticky; top: 0; background: var(--superficie-2); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--texto-suave); cursor: pointer; white-space: nowrap; user-select: none; }
+  th:hover { color: var(--marca); }
+  td.num, th.num { text-align: right; }
+  td.produto { display: flex; align-items: center; gap: 10px; min-width: 320px; }
+  td.produto img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; background: var(--superficie-2); flex: none; }
+  td.produto a { color: inherit; text-decoration: none; font-weight: 500; }
+  td.produto a:hover { color: var(--marca); text-decoration: underline; }
+  td.ganho-col { color: var(--ganho); font-weight: 700; }
+
+  .vazio { text-align: center; padding: 48px 16px; color: var(--texto-suave); background: var(--superficie); border: 1px dashed var(--borda); border-radius: var(--raio); }
+  .vazio code { background: var(--superficie-2); padding: 2px 6px; border-radius: 6px; }
+  .mais { display: flex; justify-content: center; margin: 16px 0 6px; }
+  footer { color: var(--texto-suave); font-size: 12px; text-align: center; padding: 22px 16px 32px; }
+  [hidden] { display: none !important; }
+
+  @media (max-width: 560px) {
+    .campo.busca, .campo.ordem { grid-column: 1 / -1; }
+    .filtros-grade { grid-template-columns: repeat(2, 1fr); }
+    .indicadores { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .indicador { padding: 10px 12px; }
+    .indicador strong { font-size: 18px; }
+    .acoes .btn { flex: 1 1 auto; }
+    .grade { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .preco { font-size: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .cartao { transition: none; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="conteiner topo">
+    <div>
+      <h1>📊 Painel de Afiliados Shopee</h1>
+      <p>Atualizado em __ATUALIZADO_EM__ · ordenado pela maior comissão estimada</p>
+    </div>
+    <button class="btn-tema" id="btnTema" type="button" aria-label="Alternar tema claro/escuro">🌓 Tema</button>
+  </div>
+</header>
+
+<main class="conteiner">
+  <section class="indicadores" id="indicadores" aria-label="Resumo"></section>
+
+  <section class="filtros" aria-label="Filtros">
+    <div class="filtros-grade">
+      <div class="campo busca"><label for="busca">Buscar produto ou loja</label><input id="busca" type="search" placeholder="Ex.: fone, garrafa, kit..."></div>
+      <div class="campo" id="campoLoja"><label for="loja">Loja</label><select id="loja"><option value="">Todas</option></select></div>
+      <div class="campo"><label for="precoMin">Preço mín. (R$)</label><input id="precoMin" type="number" min="0" step="1" inputmode="decimal"></div>
+      <div class="campo"><label for="precoMax">Preço máx. (R$)</label><input id="precoMax" type="number" min="0" step="1" inputmode="decimal"></div>
+      <div class="campo"><label for="pctMin">Comissão mín. (%)</label><input id="pctMin" type="number" min="0" step="0.5" inputmode="decimal"></div>
+      <div class="campo"><label for="vendasMin">Vendas mín.</label><input id="vendasMin" type="number" min="0" step="10" inputmode="numeric"></div>
+      <div class="campo ordem"><label for="ordem">Ordenar por</label>
+        <select id="ordem">
+          <option value="comissao">Maior comissão (R$)</option>
+          <option value="pct">Maior comissão (%)</option>
+          <option value="vendas">Mais vendidos</option>
+          <option value="nota">Melhor avaliação</option>
+          <option value="precoAsc">Menor preço</option>
+          <option value="precoDesc">Maior preço</option>
+        </select>
+      </div>
+    </div>
+    <div class="barra-acoes">
+      <span class="contagem" id="contagem" aria-live="polite"></span>
+      <div class="acoes">
+        <button class="btn" id="btnLimpar" type="button">Limpar filtros</button>
+        <button class="btn" id="btnCartoes" type="button">▦ Cartões</button>
+        <button class="btn" id="btnTabela" type="button">☰ Tabela</button>
+        <button class="btn primario" id="btnCsv" type="button">⬇ Baixar CSV filtrado</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="areaCartoes" class="grade" aria-label="Produtos"></section>
+  <section id="areaTabela" class="tabela-caixa" hidden>
+    <table>
+      <thead><tr id="cabecalhoTabela"></tr></thead>
+      <tbody id="corpoTabela"></tbody>
+    </table>
+  </section>
+  <div id="vazio" class="vazio" hidden></div>
+  <div class="mais"><button class="btn" id="btnMais" type="button" hidden>Mostrar mais</button></div>
+</main>
+
+<footer>
+  Robô Rastreador de Afiliados v__VERSAO__ · A comissão estimada é uma projeção (preço médio × % da oferta); o ganho real depende das regras da Shopee.
+</footer>
+
+<script>
+"use strict";
+const DADOS = __DADOS_JSON__;
+
+/* ---------- utilidades ---------- */
+const $ = (id) => document.getElementById(id);
+const moeda = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+const inteiro = new Intl.NumberFormat("pt-BR");
+const pct = (v) => v.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 2 }) + "%";
+const TAMANHO_PAGINA = 24;
+
+function criar(tag, classe, texto) {
+  const e = document.createElement(tag);
+  if (classe) e.className = classe;
+  if (texto !== undefined) e.textContent = texto;   // textContent: nunca interpreta HTML
+  return e;
+}
+function urlSegura(valor) {
+  try {
+    const u = new URL(valor);
+    return (u.protocol === "https:" || u.protocol === "http:") ? u.href : "#";
+  } catch (_) { return "#"; }
+}
+function guardar(chave, valor) { try { localStorage.setItem(chave, valor); } catch (_) {} }
+function ler(chave) { try { return localStorage.getItem(chave); } catch (_) { return null; } }
+function imagem(produto, classe) {
+  const img = criar("img", classe);
+  img.loading = "lazy"; img.alt = ""; img.referrerPolicy = "no-referrer";
+  img.src = urlSegura(produto.imagem);
+  return img;
+}
+
+/* ---------- estado ---------- */
+const estado = { visao: ler("visao") || "cartoes", visiveis: TAMANHO_PAGINA, ordem: "comissao" };
+const ORDENACOES = {
+  comissao:  (a, b) => b.comissao - a.comissao || b.vendas - a.vendas,
+  pct:       (a, b) => b.pct - a.pct || b.comissao - a.comissao,
+  vendas:    (a, b) => b.vendas - a.vendas,
+  nota:      (a, b) => b.nota - a.nota || b.vendas - a.vendas,
+  precoAsc:  (a, b) => a.preco - b.preco,
+  precoDesc: (a, b) => b.preco - a.preco,
+};
+
+function lerFiltros() {
+  const numero = (id) => { const v = parseFloat($(id).value); return Number.isFinite(v) ? v : null; };
+  return {
+    busca: $("busca").value.trim().toLowerCase(), loja: $("loja").value,
+    precoMin: numero("precoMin"), precoMax: numero("precoMax"),
+    pctMin: numero("pctMin"), vendasMin: numero("vendasMin"),
+  };
+}
+function filtrar() {
+  const f = lerFiltros();
+  return DADOS.filter((p) =>
+    (!f.busca || (p.titulo + " " + p.loja).toLowerCase().includes(f.busca)) &&
+    (!f.loja || p.loja === f.loja) &&
+    (f.precoMin === null || p.preco >= f.precoMin) &&
+    (f.precoMax === null || p.preco <= f.precoMax) &&
+    (f.pctMin === null || p.pct >= f.pctMin) &&
+    (f.vendasMin === null || p.vendas >= f.vendasMin)
+  ).sort(ORDENACOES[estado.ordem]);
+}
+
+/* ---------- renderização ---------- */
+function renderIndicadores(lista) {
+  const total = lista.length;
+  const maior = total ? Math.max(...lista.map((p) => p.comissao)) : 0;
+  const media = total ? lista.reduce((s, p) => s + p.pct, 0) / total : 0;
+  const precoMedio = total ? lista.reduce((s, p) => s + p.preco, 0) / total : 0;
+  const itens = [
+    ["Produtos", inteiro.format(total), ""],
+    ["Maior comissão por venda", moeda.format(maior), "destaque"],
+    ["Comissão média", pct(media), ""],
+    ["Preço médio", moeda.format(precoMedio), ""],
+  ];
+  const caixa = $("indicadores"); caixa.replaceChildren();
+  for (const [rotulo, valor, extra] of itens) {
+    const c = criar("div", "indicador " + extra);
+    c.append(criar("span", "", rotulo), criar("strong", "", valor));
+    caixa.append(c);
+  }
+}
+
+function criarCartao(p) {
+  const c = criar("article", "cartao");
+  const foto = criar("div", "foto");
+  const img = imagem(p);
+  img.addEventListener("error", () => { img.remove(); foto.classList.add("sem-imagem"); });
+  foto.append(img, criar("span", "selo" + (p.pos <= 3 ? " top" : ""), "#" + p.pos));
+  if (p.desconto > 0) foto.append(criar("span", "selo-desc", "-" + Math.round(p.desconto) + "%"));
+
+  const corpo = criar("div", "corpo");
+  const titulo = criar("h3", "titulo", p.titulo); titulo.title = p.titulo;
+  const ganho = criar("div", "ganho");
+  ganho.append(criar("strong", "", moeda.format(p.comissao)), criar("small", "", pct(p.pct) + " por venda"));
+  const meta = criar("div", "meta");
+  meta.append(criar("span", "", inteiro.format(p.vendas) + " vendidos"));
+  const nota = criar("span", "");
+  if (p.nota > 0) { nota.append(criar("span", "estrela", "★ "), document.createTextNode(p.nota.toFixed(1))); }
+  meta.append(nota);
+  const link = criar("a", "abrir", "Abrir na Shopee");
+  link.href = urlSegura(p.url); link.target = "_blank"; link.rel = "noopener noreferrer";
+
+  corpo.append(titulo);
+  if (p.loja) corpo.append(criar("div", "loja", p.loja));
+  corpo.append(criar("div", "preco", moeda.format(p.preco)), ganho, meta, link);
+  c.append(foto, corpo);
+  return c;
+}
+
+const COLUNAS_TABELA = [
+  ["pos", "Nº", "num"], ["titulo", "Produto", ""], ["loja", "Loja", ""],
+  ["preco", "Preço", "num"], ["pct", "Comissão %", "num"], ["comissao", "Comissão R$", "num"],
+  ["vendas", "Vendas", "num"], ["nota", "Nota", "num"],
+];
+const ORDEM_POR_COLUNA = { preco: "precoAsc", pct: "pct", comissao: "comissao", vendas: "vendas", nota: "nota" };
+
+function montarCabecalhoTabela() {
+  const tr = $("cabecalhoTabela"); tr.replaceChildren();
+  for (const [chave, rotulo, classe] of COLUNAS_TABELA) {
+    const th = criar("th", classe, rotulo);
+    if (ORDEM_POR_COLUNA[chave]) {
+      th.title = "Clique para ordenar";
+      th.addEventListener("click", () => { estado.ordem = ORDEM_POR_COLUNA[chave]; $("ordem").value = estado.ordem; atualizar(); });
+    }
+    tr.append(th);
+  }
+}
+function criarLinha(p) {
+  const tr = criar("tr");
+  const produto = criar("td", "produto");
+  const a = criar("a", "", p.titulo);
+  a.href = urlSegura(p.url); a.target = "_blank"; a.rel = "noopener noreferrer";
+  produto.append(imagem(p), a);
+  const celulas = [
+    criar("td", "num", String(p.pos)), produto, criar("td", "", p.loja || "—"),
+    criar("td", "num", moeda.format(p.preco)), criar("td", "num", pct(p.pct)),
+    criar("td", "num ganho-col", moeda.format(p.comissao)),
+    criar("td", "num", inteiro.format(p.vendas)), criar("td", "num", p.nota > 0 ? p.nota.toFixed(1) : "—"),
+  ];
+  tr.append(...celulas);
+  return tr;
+}
+
+function atualizar(reiniciarPaginacao = true) {
+  if (reiniciarPaginacao) estado.visiveis = TAMANHO_PAGINA;
+  const lista = filtrar();
+  const parte = lista.slice(0, estado.visiveis);
+
+  renderIndicadores(lista);
+  $("contagem").textContent = lista.length === DADOS.length
+    ? inteiro.format(lista.length) + " produtos"
+    : inteiro.format(lista.length) + " de " + inteiro.format(DADOS.length) + " produtos";
+
+  const modoCartoes = estado.visao === "cartoes";
+  $("areaCartoes").hidden = !modoCartoes || !lista.length;
+  $("areaTabela").hidden = modoCartoes || !lista.length;
+  $("btnCartoes").classList.toggle("ativo", modoCartoes);
+  $("btnTabela").classList.toggle("ativo", !modoCartoes);
+
+  $("areaCartoes").replaceChildren(...(modoCartoes ? parte.map(criarCartao) : []));
+  $("corpoTabela").replaceChildren(...(modoCartoes ? [] : parte.map(criarLinha)));
+  $("btnMais").hidden = lista.length <= estado.visiveis;
+
+  const vazio = $("vazio");
+  vazio.hidden = lista.length > 0;
+  vazio.replaceChildren();
+  if (!lista.length) {
+    if (!DADOS.length) {
+      vazio.append(document.createTextNode("Ainda não há produtos. Execute "), criar("code", "", "python main.py"),
+                   document.createTextNode(" para coletar os dados."));
+    } else {
+      vazio.textContent = "Nenhum produto corresponde aos filtros atuais.";
+    }
+  }
+  $("btnCsv").disabled = !lista.length;
+}
+
+/* ---------- exportação do recorte filtrado ---------- */
+function baixarCsv() {
+  const lista = filtrar();
+  const escapar = (v) => '"' + String(v).replace(/"/g, '""') + '"';
+  const num = (v) => v.toFixed(2).replace(".", ",");
+  const linhas = [["Nº", "Produto", "Loja", "Preço (R$)", "Comissão (%)", "Comissão estimada (R$)", "Vendas", "Avaliação", "Link de afiliado"]];
+  for (const p of lista) {
+    linhas.push([p.pos, p.titulo, p.loja, num(p.preco), num(p.pct), num(p.comissao), p.vendas, num(p.nota), p.url]);
+  }
+  const texto = "﻿" + linhas.map((l) => l.map(escapar).join(";")).join("\r\n");
+  const blob = new Blob([texto], { type: "text/csv;charset=utf-8" });
+  const a = criar("a"); a.href = URL.createObjectURL(blob); a.download = "afiliados_filtrados.csv";
+  document.body.append(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+}
+
+/* ---------- inicialização ---------- */
+function aplicarTema(tema) { document.documentElement.dataset.tema = tema; }
+function iniciarTema() {
+  const salvo = ler("tema");
+  aplicarTema(salvo || (matchMedia("(prefers-color-scheme: dark)").matches ? "escuro" : "claro"));
+  $("btnTema").addEventListener("click", () => {
+    const novo = document.documentElement.dataset.tema === "escuro" ? "claro" : "escuro";
+    aplicarTema(novo); guardar("tema", novo);
+  });
+}
+function iniciarLojas() {
+  const lojas = [...new Set(DADOS.map((p) => p.loja).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  $("campoLoja").hidden = lojas.length === 0;
+  for (const nome of lojas) { const o = criar("option", "", nome); o.value = nome; $("loja").append(o); }
+}
+function iniciar() {
+  iniciarTema(); iniciarLojas(); montarCabecalhoTabela();
+  for (const id of ["busca", "loja", "precoMin", "precoMax", "pctMin", "vendasMin"]) {
+    $(id).addEventListener("input", () => atualizar());
+  }
+  $("ordem").addEventListener("change", (e) => { estado.ordem = e.target.value; atualizar(); });
+  $("btnLimpar").addEventListener("click", () => {
+    for (const id of ["busca", "loja", "precoMin", "precoMax", "pctMin", "vendasMin"]) $(id).value = "";
+    estado.ordem = "comissao"; $("ordem").value = "comissao"; atualizar();
+  });
+  $("btnCartoes").addEventListener("click", () => { estado.visao = "cartoes"; guardar("visao", "cartoes"); atualizar(false); });
+  $("btnTabela").addEventListener("click", () => { estado.visao = "tabela"; guardar("visao", "tabela"); atualizar(false); });
+  $("btnMais").addEventListener("click", () => { estado.visiveis += TAMANHO_PAGINA; atualizar(false); });
+  $("btnCsv").addEventListener("click", baixarCsv);
+  atualizar();
+}
+iniciar();
+</script>
+</body>
+</html>
