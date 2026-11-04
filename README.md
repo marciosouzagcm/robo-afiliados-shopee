@@ -1,3 +1,6 @@
+> **Disclaimer:** Projeto independente, educacional e não-oficial. Não afiliado, endossado ou mantido pela Shopee. Shopee é marca registrada da Shopee Pte. Ltd.
+> Feito para fins de estudo da Shopee Affiliate Open API.
+
 # 📊 Robô Rastreador de Afiliados — Shopee
 
 Robô em Python que consulta a **Shopee Affiliate Open API**, reúne os produtos mais vendidos, estima a **comissão de afiliado em R$** e entrega o resultado em quatro formatos:
